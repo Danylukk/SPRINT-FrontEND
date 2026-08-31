@@ -17,6 +17,8 @@ class OperationalEvent:
     summary: str
     recommendation: str
     source: str
+    reading_id: str = ""
+    inference_id: str = ""
     timestamp: str = field(default_factory=lambda: datetime.now().isoformat(timespec="seconds"))
     id: str = field(default_factory=lambda: str(uuid4()))
 
@@ -39,4 +41,6 @@ class OperationalEvent:
             summary=str(data.get("summary", "")),
             recommendation=str(data.get("recommendation", "")),
             source=str(data.get("source", "rules_fallback")),
+            reading_id=str(data.get("reading_id", "")),
+            inference_id=str(data.get("inference_id", "")),
         )

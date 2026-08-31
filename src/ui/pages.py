@@ -1,4 +1,5 @@
 import time
+from html import escape
 
 import pandas as pd
 import plotly.express as px
@@ -141,7 +142,7 @@ def render_operational_dashboard(service: EquipmentService) -> None:
     render_health_indicator(str(alerts["geral"]))
 
     render_operational_message(
-        "As leituras são simuladas e salvas em data/telemetry_history.csv para validar fluxo, histórico e alertas antes da integração com sensores reais."
+        "As leituras são simuladas e gravadas no histórico local de execução, preservando o CSV de referência versionado para validar fluxo, histórico e alertas antes da integração com sensores reais."
     )
 
     st.subheader("Telemetria atual")
@@ -169,7 +170,7 @@ def render_operational_asset_header(equipment: Equipment) -> None:
             <div class="info-section">
                 <h4>Cadastro e local</h4>
                 <p><strong>Status:</strong> {status_badge_html(equipment.status_operacional)}</p>
-                <p><strong>Local:</strong> {equipment.local_instalacao}</p>
+                <p><strong>Local:</strong> {escape(equipment.local_instalacao)}</p>
             </div>
             """,
             unsafe_allow_html=True,
@@ -375,10 +376,10 @@ def render_technical_sheet(equipment: Equipment) -> None:
             f"""
             <div class="info-section">
                 <h4>Identificação</h4>
-                <p><strong>TAG:</strong> {equipment.tag}</p>
-                <p><strong>Modelo:</strong> {equipment.modelo}</p>
-                <p><strong>Fabricante:</strong> {equipment.fabricante}</p>
-                <p><strong>Cadastro:</strong> {equipment.data_cadastro}</p>
+                <p><strong>TAG:</strong> {escape(equipment.tag)}</p>
+                <p><strong>Modelo:</strong> {escape(equipment.modelo)}</p>
+                <p><strong>Fabricante:</strong> {escape(equipment.fabricante)}</p>
+                <p><strong>Cadastro:</strong> {escape(equipment.data_cadastro)}</p>
             </div>
             """,
             unsafe_allow_html=True,
@@ -389,7 +390,7 @@ def render_technical_sheet(equipment: Equipment) -> None:
             f"""
             <div class="info-section">
                 <h4>Especificações</h4>
-                <p><strong>Potência:</strong> {equipment.potencia:g} {equipment.unidade_potencia}</p>
+                <p><strong>Potência:</strong> {equipment.potencia:g} {escape(equipment.unidade_potencia)}</p>
                 <p><strong>Tensão:</strong> {equipment.tensao:g} V</p>
                 <p><strong>Corrente nominal:</strong> {equipment.corrente_nominal:g} A</p>
                 <p><strong>Rotação nominal:</strong> {equipment.rotacao_nominal:g} RPM</p>
@@ -403,7 +404,7 @@ def render_technical_sheet(equipment: Equipment) -> None:
             f"""
             <div class="info-section">
                 <h4>Instalação e condição</h4>
-                <p><strong>Local:</strong> {equipment.local_instalacao}</p>
+                <p><strong>Local:</strong> {escape(equipment.local_instalacao)}</p>
                 <div class="status-row">
                     <strong>Status operacional:</strong>
                     {status_badge_html(equipment.status_operacional)}

@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 
 from src.models.equipment import Equipment
+from src.repositories.errors import RepositoryDataError
 
 
 class EquipmentRepository:
@@ -21,10 +22,13 @@ class EquipmentRepository:
 
     def save_all(self, equipments: list[Equipment]) -> None:
         payload = [equipment.to_dict() for equipment in equipments]
-        self.file_path.write_text(
-            json.dumps(payload, ensure_ascii=False, indent=2),
-            encoding="utf-8",
-        )
+        try:
+            self.file_path.write_text(
+                json.dumps(payload, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+        except OSError as error:
+            raise RepositoryDataError("Não foi possível gravar o cadastro de equipamentos.") from error
 
     def add(self, equipment: Equipment) -> None:
         equipments = self.get_all()
@@ -38,12 +42,17 @@ class EquipmentRepository:
     def _read_json(self) -> list[dict]:
         try:
             content = self.file_path.read_text(encoding="utf-8").strip()
-            if not content:
-                return []
-            data = json.loads(content)
-            return data if isinstance(data, list) else []
-        except (json.JSONDecodeError, OSError):
+        except OSError as error:
+            raise RepositoryDataError("Não foi possível ler o cadastro de equipamentos.") from error
+        if not content:
             return []
+        try:
+            data = json.loads(content)
+        except json.JSONDecodeError as error:
+            raise RepositoryDataError("O cadastro de equipamentos contém JSON inválido e foi preservado.") from error
+        if not isinstance(data, list):
+            raise RepositoryDataError("O cadastro de equipamentos possui formato inválido e foi preservado.")
+        return data
 
     @staticmethod
     def _default_examples() -> list[Equipment]:

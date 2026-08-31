@@ -1,4 +1,4 @@
-from src.services.alert_service import STATUS_CRITICAL, STATUS_HEALTHY, STATUS_WARNING
+from src.services.alert_service import STATUS_CRITICAL, STATUS_HEALTHY, STATUS_UNAVAILABLE, STATUS_WARNING
 
 
 class NLPSummaryService:
@@ -12,6 +12,11 @@ class NLPSummaryService:
     provider = "mock_nlp"
 
     def build_summary(self, *, tag: str, status: str, dominant_metric: str, message: str) -> str:
+        if status == STATUS_UNAVAILABLE:
+            return (
+                f"O ativo {tag} não possui dados válidos suficientes para análise de {dominant_metric}. "
+                f"{message} Isso não representa uma anomalia do equipamento."
+            )
         if status == STATUS_CRITICAL:
             return (
                 f"O ativo {tag} apresenta desvio operacional crítico relacionado a {dominant_metric}. "
@@ -29,6 +34,8 @@ class NLPSummaryService:
 
     def build_recommendation(self, *, status: str, dominant_metric: str) -> str:
         metric = dominant_metric.lower()
+        if status == STATUS_UNAVAILABLE:
+            return "Verificar a origem da leitura e coletar dados válidos antes de tomar uma decisão operacional."
         if status == STATUS_CRITICAL:
             if "vibra" in metric:
                 return "Priorizar inspeção mecânica, verificando rolamentos, fixação e possível desalinhamento."

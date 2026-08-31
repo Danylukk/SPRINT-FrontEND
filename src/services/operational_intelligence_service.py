@@ -1,16 +1,14 @@
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Any
+from uuid import uuid4
 
 from src.models.equipment import Equipment
 from src.models.operational_event import OperationalEvent
-from src.services.alert_service import (
-    STATUS_CRITICAL,
-    STATUS_HEALTHY,
-    STATUS_WARNING,
-    AlertResult,
-    AlertService,
-)
+from src.services.analytics_provider import AnalyticsProvider, RulesAnalyticsProvider
 from src.services.nlp_summary_service import NLPSummaryService
+
+STALE_DATA_THRESHOLD_MINUTES = 120
 
 
 @dataclass(frozen=True)
@@ -24,65 +22,70 @@ class OperationalSnapshot:
     summary: str
     recommendation: str
     source: str
+    analytics_provider: str
     nlp_provider: str
+    score: float | None
+    timestamp: str
+    reading_id: str
+    inference_id: str
+    is_stale: bool
     reading: dict[str, Any]
 
 
 class OperationalIntelligenceService:
     """Camada desacoplada entre o front-end e o processamento analítico.
 
-    Nesta Sprint, AlertService funciona como fallback analítico por regras e o modo
-    de demonstração injeta uma leitura controlada. Um modelo de ML futuro pode
-    substituir a origem das leituras/alertas mantendo o contrato OperationalSnapshot.
+    A interface consome somente OperationalSnapshot. Hoje o provider é baseado em
+    regras; um futuro provider de ML pode manter o mesmo contrato sem alterar a UI.
     """
 
     def __init__(
         self,
-        alert_service: AlertService | None = None,
+        analytics_provider: AnalyticsProvider | None = None,
         nlp_service: NLPSummaryService | None = None,
+        stale_data_threshold_minutes: int = STALE_DATA_THRESHOLD_MINUTES,
     ) -> None:
-        self.alert_service = alert_service or AlertService()
+        self.analytics_provider = analytics_provider or RulesAnalyticsProvider()
         self.nlp_service = nlp_service or NLPSummaryService()
+        self.stale_data_threshold_minutes = stale_data_threshold_minutes
 
     def analyze(
         self,
         equipment: Equipment,
         reading: dict[str, Any],
-        *,
-        simulate_anomaly: bool = False,
     ) -> OperationalSnapshot:
         effective_reading = dict(reading)
-        source = "rules_fallback"
-        if simulate_anomaly:
-            effective_reading = self._build_demo_anomaly(equipment, effective_reading)
-            source = "simulation"
-
-        results = self.alert_service.evaluate_all(effective_reading, equipment.corrente_nominal)
-        status = str(results["geral"])
-        dominant_metric, dominant_alert, dominant_value = self._dominant_alert(results, effective_reading)
-        severity = self._severity_for_status(status)
+        assessment = self.analytics_provider.analyze(equipment, effective_reading)
+        timestamp = str(effective_reading.get("timestamp") or datetime.now().isoformat(timespec="seconds"))
+        reading_id = str(effective_reading.get("reading_id") or uuid4())
         summary = self.nlp_service.build_summary(
             tag=equipment.tag,
-            status=status,
-            dominant_metric=dominant_metric,
-            message=dominant_alert.message,
+            status=assessment.status,
+            dominant_metric=assessment.dominant_metric,
+            message=assessment.message,
         )
         recommendation = self.nlp_service.build_recommendation(
-            status=status,
-            dominant_metric=dominant_metric,
+            status=assessment.status,
+            dominant_metric=assessment.dominant_metric,
         )
 
         return OperationalSnapshot(
             tag=equipment.tag,
             area=equipment.local_instalacao,
-            status=status,
-            severity=severity,
-            dominant_metric=dominant_metric,
-            dominant_value=dominant_value,
+            status=assessment.status,
+            severity=assessment.severity,
+            dominant_metric=assessment.dominant_metric,
+            dominant_value=assessment.dominant_value,
             summary=summary,
             recommendation=recommendation,
-            source=source,
+            source=str(effective_reading.get("source", "seed_history")),
+            analytics_provider=assessment.provider,
             nlp_provider=self.nlp_service.provider,
+            score=assessment.score,
+            timestamp=timestamp,
+            reading_id=reading_id,
+            inference_id=str(uuid4()),
+            is_stale=self._is_stale(timestamp),
             reading=effective_reading,
         )
 
@@ -91,7 +94,10 @@ class OperationalIntelligenceService:
         snapshot: OperationalSnapshot,
         *,
         previous_status: str,
-    ) -> OperationalEvent:
+    ) -> OperationalEvent | None:
+        """Cria evento somente quando o estado analítico realmente mudou."""
+        if previous_status == snapshot.status:
+            return None
         return OperationalEvent(
             tag=snapshot.tag,
             area=snapshot.area,
@@ -104,43 +110,14 @@ class OperationalIntelligenceService:
             summary=snapshot.summary,
             recommendation=snapshot.recommendation,
             source=snapshot.source,
+            reading_id=snapshot.reading_id,
+            inference_id=snapshot.inference_id,
+            timestamp=snapshot.timestamp,
         )
 
-    @staticmethod
-    def _build_demo_anomaly(equipment: Equipment, reading: dict[str, Any]) -> dict[str, Any]:
-        # Cenário controlado: vibração acima do limite crítico já adotado na Sprint 2.
-        reading["vibracao_mm_s"] = 7.8
-        # Mantém as demais variáveis plausíveis e sem forçar outro gatilho crítico.
-        reading["temperatura_c"] = min(float(reading.get("temperatura_c", 65.0)), 78.0)
-        if equipment.corrente_nominal > 0:
-            reading["corrente_a"] = min(
-                float(reading.get("corrente_a", equipment.corrente_nominal)),
-                equipment.corrente_nominal * 1.08,
-            )
-        return reading
-
-    def _dominant_alert(
-        self,
-        results: dict[str, AlertResult | str],
-        reading: dict[str, Any],
-    ) -> tuple[str, AlertResult, str]:
-        candidates = [
-            ("Temperatura", results["temperatura"], f"{float(reading['temperatura_c']):.1f} °C"),
-            ("Vibração", results["vibracao"], f"{float(reading['vibracao_mm_s']):.2f} mm/s"),
-            ("Corrente", results["corrente"], f"{float(reading['corrente_a']):.2f} A"),
-        ]
-        metric, alert, value = max(
-            candidates,
-            key=lambda item: self.alert_service.STATUS_ORDER[item[1].status],
-        )
-        return metric, alert, value
-
-    @staticmethod
-    def _severity_for_status(status: str) -> str:
-        if status == STATUS_CRITICAL:
-            return "Alta"
-        if status == STATUS_WARNING:
-            return "Média"
-        if status == STATUS_HEALTHY:
-            return "Baixa"
-        return "Informativa"
+    def _is_stale(self, timestamp: str) -> bool:
+        try:
+            reading_time = datetime.fromisoformat(timestamp)
+        except ValueError:
+            return True
+        return (datetime.now() - reading_time).total_seconds() > self.stale_data_threshold_minutes * 60
