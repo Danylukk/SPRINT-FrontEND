@@ -55,7 +55,7 @@ def render_telemetry_charts(chart_data: pd.DataFrame) -> None:
             plot_bgcolor="#F8FAFC",
             font_color="#0F172A",
         )
-        st.plotly_chart(fig, width="stretch")
+        st.plotly_chart(fig, use_container_width=True)
 
 
 def render_technical_sheet(equipment: Equipment) -> None:
