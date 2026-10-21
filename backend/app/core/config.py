@@ -12,6 +12,7 @@ class Settings:
     database_path: Path
     token_ttl_seconds: int = 28800
     llm_provider: str = "simulated"
+    motor_data_dir: Path | None = None
 
     def __post_init__(self):
         if self.token_ttl_seconds < 1:
@@ -27,4 +28,5 @@ class Settings:
             database_path=path if path.is_absolute() else BACKEND_DIR / path,
             token_ttl_seconds=int(os.getenv("TOKEN_TTL_SECONDS", "28800")),
             llm_provider=os.getenv("LLM_PROVIDER", "simulated"),
+            motor_data_dir=Path(os.environ["MOTOR_DATA_DIR"]).resolve() if os.getenv("MOTOR_DATA_DIR") else None,
         )

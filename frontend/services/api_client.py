@@ -1,5 +1,6 @@
 """Único módulo do front autorizado a realizar chamadas HTTP."""
 import os
+from urllib.parse import quote
 from pathlib import Path
 
 import requests
@@ -44,6 +45,10 @@ class APIClient:
                 422: "Confira os dados: usuário com 3 a 40 caracteres, senha com 8 a 128 e texto com 1 a 4000.",
                 503: "O modelo ou armazenamento está indisponível. Tente novamente mais tarde.",
             }
+            if path.startswith("/motor/"):
+                defaults.update({404: "Equipamento não encontrado.", 409: "Essa TAG já está cadastrada.",
+                    422: "Confira os campos obrigatórios, os valores maiores que zero e a confirmação do cadastro.",
+                    503: "Os dados operacionais estão indisponíveis. Verifique o backend e tente novamente."})
             # Não exibir corpo arbitrário/HTML ou dados internos de erros do servidor.
             raise APIError(defaults.get(response.status_code, "A API não conseguiu concluir a operação."),
                            response.status_code)
@@ -77,3 +82,25 @@ class APIClient:
 
     def send_message(self, conversation_id, content):
         return self._request("POST", f"/conversas/{conversation_id}/mensagens", {"conteudo": content})
+
+    def me(self):
+        return self._request("GET", "/auth/me")
+
+    def fleet(self):
+        return self._request("GET", "/motor/equipamentos")
+
+    def register_equipment(self, payload):
+        return self._request("POST", "/motor/equipamentos", payload)
+
+    def motor_panel(self, include_seed=False):
+        return self._request("GET", f"/motor/painel?include_seed={str(include_seed).lower()}")
+
+    def motor_detail(self, tag):
+        return self._request("GET", f"/motor/equipamentos/{quote(tag, safe='')}")
+
+    def motor_refresh(self, tag, demo=False):
+        action = "demo" if demo else "leituras"
+        return self._request("POST", f"/motor/equipamentos/{quote(tag, safe='')}/{action}")
+
+    def raw_sensors(self, tag):
+        return self._request("GET", f"/motor/equipamentos/{quote(tag, safe='')}/sensores")

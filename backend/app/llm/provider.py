@@ -11,11 +11,21 @@ class ModelProvider:
         self.model = {"simulated": "motor-assistant-rules-v1", "echo": "echo-v1",
                       "unavailable": "unavailable"}[provider]
 
-    def generate(self, history, content):
+    def generate(self, history, content, context=None):
         if self.name == "unavailable":
             raise AppError(503, "O modelo está indisponível. Tente novamente mais tarde.")
         if self.name == "echo":
             return f"[Bot eco simulado] Você escreveu: {content}"
+        if context:
+            item, snapshot = context["equipamento"], context["snapshot"]
+            freshness = "Dados desatualizados" if snapshot["is_stale"] else "Leitura atual"
+            return (f"**Consulta por regras · {item['tag']}**\n\n"
+                    f"Modelo: {item['modelo']} · Área: {item['local_instalacao']}.\n\n"
+                    f"Estado analítico: **{snapshot['status']}**. {freshness}.\n\n"
+                    f"{snapshot['summary']}\n\n{snapshot['recommendation']}\n\n"
+                    f"Fonte: {snapshot['source']} · Leitura: {snapshot['timestamp']} · "
+                    f"ID: {snapshot['reading_id']}.\n\n"
+                    "Dados da API do sistema, sem sensores reais. Resposta determinística, sem LLM.")
         normalized = unicodedata.normalize("NFKD", content.lower()).encode("ascii", "ignore").decode()
         if "api" in normalized or "fastapi" in normalized:
             answer = ("Uma API é um contrato de comunicação entre programas. Neste CP6, o Streamlit "

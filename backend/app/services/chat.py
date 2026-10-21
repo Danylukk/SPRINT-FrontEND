@@ -2,9 +2,10 @@ from app.core.errors import AppError
 
 
 class ChatService:
-    def __init__(self, repository, provider):
+    def __init__(self, repository, provider, motor_service=None):
         self.repository = repository
         self.provider = provider
+        self.motor_service = motor_service
 
     def health(self):
         return {"status": "degraded" if self.provider.name == "unavailable" else "ok",
@@ -24,7 +25,8 @@ class ChatService:
 
     def send(self, user_id, conversation_id, data):
         history = self.get(user_id, conversation_id)["mensagens"]
-        answer = self.provider.generate(history, data.conteudo)
+        context = self.motor_service.chat_context(data.conteudo) if self.motor_service else None
+        answer = self.provider.generate(history, data.conteudo, context)
         # Falhas no provider não gravam meia interação no histórico.
         pair = self.repository.append_pair(user_id, conversation_id, data.conteudo, answer)
         if not pair:

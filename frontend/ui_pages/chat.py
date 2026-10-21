@@ -16,14 +16,16 @@ def render_chat():
         st.stop()
 
     st.title("Assistente Motor Digital Twin")
-    st.caption("Bot simulado · Sem LLM externo · Conversas privadas por conta")
+    if notice := st.session_state.pop("chat_notice", None):
+        st.error(notice)
+    st.caption("Bot por regras · Dados operacionais da API ao mencionar uma TAG · Conversas privadas por conta")
     st.caption("Em celulares, abra o menu lateral no canto superior esquerdo para acessar suas conversas.")
     if st.button("Atualizar histórico"):
         st.rerun()
     active = st.session_state.get("conversa_ativa")
     if active is None:
         st.info("Selecione uma conversa na barra lateral ou clique em Nova conversa.")
-        st.markdown("**Experimente perguntar**\n\n- O que é uma API?\n- Como o histórico é persistido?\n- O que observar na vibração de um motor?")
+        st.markdown("**Experimente perguntar**\n\n- Como está o MTR-001?\n- O que é uma API?\n- Como o histórico é persistido?")
         return
     try:
         detail = client.get_conversation(active)

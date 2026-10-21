@@ -4,10 +4,10 @@ from services.api_client import APIClient, APIError
 
 
 def render_login():
-    st.title("Motor Digital Twin · Chat")
-    st.write("Um espaço para organizar suas conversas sobre tecnologia e motores.")
-    st.caption("CP6 · Front-end em Sistemas de IA · FastAPI + Streamlit")
-    st.info("Bot simulado por regras. Funciona sem chave de IA e não consulta sensores reais.")
+    st.title("Motor Digital Twin")
+    st.write("Dashboard, cadastro técnico, telemetria, alertas e assistente em um só sistema.")
+    st.caption("Sprints 1–3 + CP6 · Front-end em Sistemas de IA · FastAPI + Streamlit")
+    st.info("Entre para acessar todos os módulos. Leituras e assistente são demonstrativos; não há sensores reais ou LLM externo.")
     client = APIClient()
     try:
         health = client.health()
