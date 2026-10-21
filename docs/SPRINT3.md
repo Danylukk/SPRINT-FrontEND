@@ -1,5 +1,7 @@
 # Sprint 3 — Motor Digital Twin
 
+> Registro histórico da entrega anterior. As funcionalidades agora estão integradas ao sistema com CP6. Para instalar e executar a versão atual, siga o README da raiz.
+
 Projeto acadêmico em Streamlit que mantém as entregas das Sprints 1 e 2 e acrescenta um painel de inteligência operacional para alertas, estados, histórico e apoio inicial à decisão.
 
 ## O que a Sprint 3 demonstra
