@@ -10,9 +10,9 @@ Todas as entregas da disciplina no **mesmo sistema Streamlit**, com login e nave
 |---|---|
 | Dashboard | Visão geral, indicadores e cadastro consolidado |
 | Cadastro Técnico | Sprint 1: validação, confirmação humana, TAG única e limpeza confirmada do formulário |
-| Consulta de Equipamentos | Sprint 1: ficha, observações, placa e botão para conversar sobre a TAG |
+| Consulta de Equipamentos | Sprint 1: ficha, observações e botão para conversar sobre a TAG |
 | Dados Brutos | Sprint 1: simulação ADC e fórmulas de conversão |
-| Dashboard Operacional | Sprint 2: área/planta, TAG, leitura simulada e três gráficos históricos |
+| Dashboard Operacional | Sprint 2: área/planta, TAG, placa simulada, leitura e três gráficos históricos |
 | Painel de Alertas e Estados | Sprint 3: thresholds originais, DEMO, estados, apoio à decisão e eventos filtráveis |
 | Assistente IA | CP6: várias conversas privadas e consulta ao estado do equipamento pela TAG |
 | Sobre o Projeto | Evolução das entregas e limites da demonstração |
