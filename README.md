@@ -182,4 +182,6 @@ Modularização, estado, autenticação, FastAPI e requests das aulas 3, 6, 7 e 
 
 ## Histórico das entregas
 
+- **Sprint 4 — Documentação Final do Projeto:** consulte a [documentação consolidada em Markdown](docs/sprint4/README.md), o [documento final em PDF](docs/sprint4/Sprint4_FrontEnd.pdf) e a [matriz de conformidade](docs/sprint4/MATRIZ_CONFORMIDADE.md).
+
 Consulte [a documentação histórica da Sprint 3](docs/SPRINT3.md). As regras originais em `src/services/`, `src/repositories/` e `src/models/` foram preservadas e são utilizadas pelo backend. As telas atuais estão integradas em `frontend/`; `app.py` da raiz é uma entrada compatível para esse mesmo sistema. Use os passos deste README para executar a versão completa.

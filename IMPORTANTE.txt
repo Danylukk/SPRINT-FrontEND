@@ -1,0 +1,60 @@
+FIAP — Challenge Forzy | Sprint 4 — Documentação Final do Projeto
+======================================================================
+
+Identificação do Projeto
+------------------------
+Instituição: FIAP
+Curso: Inteligência Artificial
+Turma: 2TIAPY
+Disciplina: FrontEnd (Front-end em Sistemas de IA)
+Ano: 2026
+Projeto: Motor Digital Twin
+Challenge: Forzy
+Entrega: Sprint 4 — Documentação Final do Projeto (sem novos desenvolvimentos)
+
+Integrantes e RMs
+-----------------
+- Arthur Pedreca de Almeida Vasco — RM 565215
+- Bruno Lanchariche Fitipaldi Lopes — RM 564129
+- Gustavo Civita Gonçalves — RM 561932
+- Rafael de Paiva Ramos — RM 563978
+- Thiago Santana Danyluk — RM 562286
+
+Links Oficiais Verificados
+--------------------------
+- Repositório principal da disciplina (GitHub):
+  https://github.com/Danylukk/SPRINT-FrontEND
+
+- Commit de referência da Sprint 3 (31/08/2026):
+  https://github.com/Danylukk/SPRINT-FrontEND/commit/3da6303304bc29accc307d6356c8b9733da256d1
+
+- Commit da versão posterior analisada — integração CP6 (21/10/2026):
+  https://github.com/Danylukk/SPRINT-FrontEND/commit/b4894fe2adea5cf4a962a573b1a5fad7c0080018
+
+- Comparação entre versões no GitHub (Sprint 3 -> CP6):
+  https://github.com/Danylukk/SPRINT-FrontEND/compare/3da6303...b4894fe
+
+- Vídeo oficial da entrega da Sprint 3:
+  https://youtu.be/_mkTfZE0Fd8
+
+- Evidências posteriores do CP6 publicadas no repositório (commit b4894fe):
+  * Vídeo integrado: https://github.com/Danylukk/SPRINT-FrontEND/blob/b4894fe2adea5cf4a962a573b1a5fad7c0080018/docs/video-cp6.mp4
+  * Roteiro de avaliação: https://github.com/Danylukk/SPRINT-FrontEND/blob/b4894fe2adea5cf4a962a573b1a5fad7c0080018/docs/ROTEIRO_CP6.md
+  * Print sistema integrado: https://github.com/Danylukk/SPRINT-FrontEND/blob/b4894fe2adea5cf4a962a573b1a5fad7c0080018/docs/sistema-integrado.png
+  * Print chat integrado: https://github.com/Danylukk/SPRINT-FrontEND/blob/b4894fe2adea5cf4a962a573b1a5fad7c0080018/docs/chat-cp6.png
+
+- Repositório complementar do Challenge integrado (solução multidisciplinar paralela em React/TS + FastAPI; não substitui o sistema Streamlit da disciplina):
+  https://github.com/Danylukk/Forzy-Project
+
+Documentação Final da Sprint 4 (Entregáveis Locais / Branch docs/sprint4-frontend)
+-----------------------------------------------------------------------------------
+- Documentação em Markdown: docs/sprint4/README.md
+- Documentação em PDF (A4): docs/sprint4/Sprint4_FrontEnd.pdf
+- Matriz de conformidade: docs/sprint4/MATRIZ_CONFORMIDADE.md
+- Evidências visuais e diagramas: docs/sprint4/evidencias/ e docs/sprint4/diagramas/
+
+Observações de Auditoria e Publicação Git:
+- Nenhum arquivo .zip original da Sprint 3 de FrontEnd foi localizado nos diretórios da disciplina; a auditoria utilizou o commit oficial 3da6303 e o vídeo no YouTube.
+- Os arquivos da Sprint 4 encontram-se na branch local "docs/sprint4-frontend" e ainda não foram enviados (push) ao repositório remoto do GitHub. Após push/merge autorizado, o acesso direto corresponderá a:
+  * Branch docs/sprint4-frontend: https://github.com/Danylukk/SPRINT-FrontEND/tree/docs/sprint4-frontend/docs/sprint4
+  * Após merge na main: https://github.com/Danylukk/SPRINT-FrontEND/tree/main/docs/sprint4
